@@ -13,6 +13,10 @@ public class Parser
         reader = new Scanner(System.in);
     }
 
+    /**
+     * 读入用户输入的指令
+     * @return 根据用户输入指令返回对应的Command类型对象
+     */
     public Command getCommand()
     {
         String inputLine;

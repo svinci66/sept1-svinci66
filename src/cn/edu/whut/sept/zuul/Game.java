@@ -82,8 +82,10 @@ public class Game
     private void printWelcome()
     {
         System.out.println();
-        System.out.println("Welcome to the World of Zuul!");
-        System.out.println("World of Zuul is a new, incredibly boring adventure game.");
+        System.out.println("you're right, but");
+        System.out.println("Welcome to the World of Genshin!");
+        System.out.println("The game takes place in a fantasy world called \"Tivat\"");
+        System.out.println("where those chosen by the gods will be granted the \"Eye of God\" to channel the power of the elements");
         System.out.println("Type 'help' if you need help.");
         System.out.println();
         System.out.println(currentRoom.getLongDescription());
