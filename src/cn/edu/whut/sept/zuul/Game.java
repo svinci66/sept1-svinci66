@@ -40,6 +40,8 @@ public class Game
 
         // create the rooms
         outside = new Room("outside the main entrance of the university");
+        outside.addItem("apple", "an apple", 1);
+        outside.addItem("banana", "a banana", 1);
         theater = new Room("in a lecture theater");
         pub = new Room("in the campus pub");
         lab = new Room("in a computing lab");
@@ -107,6 +109,7 @@ public class Game
         map.put("help", this::printHelp);
         map.put("go", this::goRoom);
         map.put("quit", this::quit);
+        map.put("look", this::look);
         return map.get(param).apply(command);
 
     }
@@ -188,4 +191,11 @@ public class Game
             return 1;  // signal that we want to quit
         }
     }
+
+    private Integer look(Command command)
+    {
+        currentRoom.getItems();
+        return 0;
+    }
+
 }

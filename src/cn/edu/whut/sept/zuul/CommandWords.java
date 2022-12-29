@@ -13,6 +13,7 @@ public class CommandWords
         validCommands.put("go", 1);
         validCommands.put("quit", 1);
         validCommands.put("help", 1);
+        validCommands.put("look", 1);
     }
 
     /**

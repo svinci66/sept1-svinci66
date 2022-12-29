@@ -1,5 +1,6 @@
 package cn.edu.whut.sept.zuul;
 
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashMap;
 
@@ -7,11 +8,13 @@ public class Room
 {
     private String description;
     private HashMap<String, Room> exits;
+    private ArrayList<Item> items;
 
     public Room(String description)
     {
         this.description = description;
         exits = new HashMap<>();
+        items = new ArrayList<>();
     }
 
     /**
@@ -23,6 +26,11 @@ public class Room
     {
         exits.put(direction, neighbor);
     }
+
+    public void addItem(String name, String description, int weight) {
+        items.add(new Item(name, description, weight));
+    }
+
 
     public String getShortDescription()
     {
@@ -47,6 +55,18 @@ public class Room
         }
         return returnString;
     }
+
+    /**
+     * 获取该房间内的所有物品信息
+     */
+    public void getItems()
+    {
+        if(items.size() == 0) System.out.println("No item!");
+        for(Item i : items) {
+            System.out.println(i.getName() + " " + i.getDescription() + ", wight is " + i.getWeight());
+        }
+    }
+
 
     /**
      * 获取指定方向的房间对象
