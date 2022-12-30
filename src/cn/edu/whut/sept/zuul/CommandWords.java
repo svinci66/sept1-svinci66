@@ -14,6 +14,7 @@ public class CommandWords
         validCommands.put("quit", 1);
         validCommands.put("help", 1);
         validCommands.put("look", 1);
+        validCommands.put("back", 1);
     }
 
     /**

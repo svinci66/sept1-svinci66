@@ -13,7 +13,9 @@
  */
 package cn.edu.whut.sept.zuul;
 
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.function.Function;
 
@@ -24,6 +26,7 @@ public class Game
     private Room currentRoom;
     private HashMap<Integer, Room> roomHashMap;
     private int roomNumbers;
+    private Deque<Integer> enterStack;
 
     /**
      * 创建游戏并初始化内部数据和解析器.
@@ -31,9 +34,11 @@ public class Game
     public Game()
     {
         roomHashMap = new HashMap<>();
+        enterStack = new LinkedList<>();
         createRooms();
         roomNumbers = roomHashMap.size();
         parser = new Parser();
+
 
     }
 
@@ -74,6 +79,7 @@ public class Game
         roomHashMap.put(office.getId(), office);
 
         currentRoom = outside;  // start game outside
+        enterStack.addLast(currentRoom.getId());
 
     }
 
@@ -123,6 +129,7 @@ public class Game
         map.put("go", this::goRoom);
         map.put("quit", this::quit);
         map.put("look", this::look);
+        map.put("back", this::back);
         return map.get(param).apply(command);
 
     }
@@ -194,6 +201,7 @@ public class Game
                 }
                 currentRoom = roomHashMap.get(currentRoomId);
             }
+            enterStack.addLast(currentRoom.getId());
             System.out.println(currentRoom.getLongDescription());
         }
         return 0;
@@ -219,5 +227,35 @@ public class Game
         currentRoom.getItems();
         return 0;
     }
+
+    /**
+     * 用于处理后退
+     * @param command
+     * @return 执行结果, 0代表继续, 1代表结束
+     */
+    private Integer back(Command command)
+    {
+        Integer num = 0;
+        if(!command.hasSecondWord()) {
+            num = 1;
+        }
+        try {
+            String numStr = command.getSecondWord();
+            num = Integer.parseInt(numStr);
+        } catch (NumberFormatException e) {
+            System.out.println("wrong number, try again");
+        }
+        if(num >= enterStack.size()) {
+            System.out.println("you can't back so much step");
+        }
+        else {
+            for(int i = 0; i < num; i++) enterStack.removeLast();
+            currentRoom = roomHashMap.get(enterStack.getLast());
+            System.out.println("you've got back");
+            System.out.println(currentRoom.getLongDescription());
+        }
+        return 0;
+    }
+
 
 }
