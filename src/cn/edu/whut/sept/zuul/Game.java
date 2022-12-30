@@ -22,14 +22,19 @@ public class Game
 {
     private Parser parser;
     private Room currentRoom;
+    private HashMap<Integer, Room> roomHashMap;
+    private int roomNumbers;
 
     /**
      * 创建游戏并初始化内部数据和解析器.
      */
     public Game()
     {
+        roomHashMap = new HashMap<>();
         createRooms();
+        roomNumbers = roomHashMap.size();
         parser = new Parser();
+
     }
 
     /**
@@ -52,18 +57,24 @@ public class Game
         outside.setExit("east", theater);
         outside.setExit("south", lab);
         outside.setExit("west", pub);
+        roomHashMap.put(outside.getId(), outside);
 
         theater.setExit("west", outside);
+        roomHashMap.put(theater.getId(), theater);
         theater.setTrap();
 
         pub.setExit("east", outside);
+        roomHashMap.put(pub.getId(), pub);
 
         lab.setExit("north", outside);
         lab.setExit("east", office);
+        roomHashMap.put(lab.getId(), lab);
 
         office.setExit("west", lab);
+        roomHashMap.put(office.getId(), office);
 
         currentRoom = outside;  // start game outside
+
     }
 
     /**
@@ -158,7 +169,6 @@ public class Game
      */
     private Integer goRoom(Command command)
     {
-
         if(!command.hasSecondWord()) {
             // if there is no second word, we don't know where to go...
             System.out.println("Go where?");
@@ -169,17 +179,21 @@ public class Game
 
         // Try to leave current room.
         Room nextRoom = currentRoom.getExit(direction);
-        System.out.println("fuck");
+
         if (nextRoom == null) {
             System.out.println("There is no door!");
         }
         else {
             currentRoom = nextRoom;
-            if(currentRoom.getTrap() == true)
-           {
+            if(currentRoom.getTrap() == true) {
                 System.out.println("You were transferred to a random room");
-                currentRoom = randomToRoom(currentRoom);
-           }
+                int currentRoomId = currentRoom.getId();
+                Random rand = new Random();
+                while(currentRoomId == currentRoom.getId()) {
+                    currentRoomId = rand.nextInt(roomNumbers) + 1;
+                }
+                currentRoom = roomHashMap.get(currentRoomId);
+            }
             System.out.println(currentRoom.getLongDescription());
         }
         return 0;
@@ -204,18 +218,6 @@ public class Game
     {
         currentRoom.getItems();
         return 0;
-    }
-
-    private Room randomToRoom(Room currentRoom)
-    {
-        Random rand = new Random();
-        int randomStep = rand.nextInt(10);
-        for(int i = 0; i < randomStep; i++)
-        {
-            String direction = currentRoom.getRandomDirection();
-            currentRoom = currentRoom.getExit(direction);
-        }
-        return currentRoom;
     }
 
 }
