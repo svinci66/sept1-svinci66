@@ -1,6 +1,7 @@
 package cn.edu.whut.sept.zuul;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Set;
 import java.util.HashMap;
 
@@ -9,12 +10,34 @@ public class Room
     private String description;
     private HashMap<String, Room> exits;
     private ArrayList<Item> items;
+    private String lastRoom;
+    private boolean trap;
 
     public Room(String description)
     {
         this.description = description;
         exits = new HashMap<>();
         items = new ArrayList<>();
+        trap = false;
+    }
+
+    public void setLastRoom(String lastRoom) {this.lastRoom = lastRoom;}
+
+    public void setTrap(){trap = true;}
+
+    public boolean getTrap() {return trap;}
+
+    public String getLastRoom(){return lastRoom;}
+
+    /**
+     * 随机获得一个相邻的方向字符串
+     * @return 一个相邻的方向字符串
+     */
+    public String getRandomDirection() {
+        ArrayList<String> keys = new ArrayList<>();
+        for(String i : exits.keySet()) keys.add(i);
+        Random rand = new Random();
+        return keys.get(rand.nextInt(keys.size()));
     }
 
     /**
@@ -66,6 +89,8 @@ public class Room
             System.out.println(i.getName() + " " + i.getDescription() + ", wight is " + i.getWeight());
         }
     }
+
+
 
 
     /**

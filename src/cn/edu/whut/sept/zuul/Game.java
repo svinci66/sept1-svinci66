@@ -14,6 +14,7 @@
 package cn.edu.whut.sept.zuul;
 
 import java.util.HashMap;
+import java.util.Random;
 import java.util.function.Function;
 
 
@@ -53,6 +54,7 @@ public class Game
         outside.setExit("west", pub);
 
         theater.setExit("west", outside);
+        theater.setTrap();
 
         pub.setExit("east", outside);
 
@@ -156,6 +158,7 @@ public class Game
      */
     private Integer goRoom(Command command)
     {
+
         if(!command.hasSecondWord()) {
             // if there is no second word, we don't know where to go...
             System.out.println("Go where?");
@@ -166,12 +169,17 @@ public class Game
 
         // Try to leave current room.
         Room nextRoom = currentRoom.getExit(direction);
-
+        System.out.println("fuck");
         if (nextRoom == null) {
             System.out.println("There is no door!");
         }
         else {
             currentRoom = nextRoom;
+            if(currentRoom.getTrap() == true)
+           {
+                System.out.println("You were transferred to a random room");
+                currentRoom = randomToRoom(currentRoom);
+           }
             System.out.println(currentRoom.getLongDescription());
         }
         return 0;
@@ -196,6 +204,18 @@ public class Game
     {
         currentRoom.getItems();
         return 0;
+    }
+
+    private Room randomToRoom(Room currentRoom)
+    {
+        Random rand = new Random();
+        int randomStep = rand.nextInt(10);
+        for(int i = 0; i < randomStep; i++)
+        {
+            String direction = currentRoom.getRandomDirection();
+            currentRoom = currentRoom.getExit(direction);
+        }
+        return currentRoom;
     }
 
 }
