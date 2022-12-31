@@ -326,7 +326,7 @@ public class Game
     private Integer eat(Command command)
     {
         if(!command.hasSecondWord()) {
-            System.out.println("Eat what?");
+            System.out.println("Eat  what?");
             return 0;
         }
         String eatCookie = command.getSecondWord();
