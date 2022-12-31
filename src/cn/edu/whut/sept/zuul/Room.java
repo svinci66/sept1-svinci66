@@ -9,7 +9,7 @@ public class Room
     private String description;
     private HashMap<String, Room> exits;
     private ArrayList<Item> items;
-    private boolean isTrap;
+    private boolean isTrap, magicCookie;
     private int id;
     private static int cnt = 0;
 
@@ -20,6 +20,16 @@ public class Room
         exits = new HashMap<>();
         items = new ArrayList<>();
         id = ++cnt;
+        magicCookie = false;
+    }
+
+    public boolean getMagicCookie() {
+        return magicCookie;
+    }
+
+
+    public void setMagicCookie() {
+        magicCookie = true;
     }
 
     public void setTrap() {
@@ -32,6 +42,10 @@ public class Room
 
     public boolean getTrap() {
         return isTrap;
+    }
+
+    public ArrayList<Item> getItems() {
+        return items;
     }
 
     /**
@@ -47,6 +61,8 @@ public class Room
     public void addItem(String name, String description, int weight) {
         items.add(new Item(name, description, weight));
     }
+    public void addItem(Item item) {items.add(item);}
+
 
 
     public String getShortDescription()
@@ -57,6 +73,17 @@ public class Room
     public String getLongDescription()
     {
         return "You are " + description + ".\n" + getExitString();
+    }
+
+    public void showItems() {
+        int sumWeight = 0;
+        System.out.print("the items of the room are :");
+        for(Item item : items) {
+            System.out.print(item.getName() + " ");
+            sumWeight += item.getWeight();
+        }
+        System.out.println();
+        System.out.println("total weight of the room is : "+sumWeight);
     }
 
     /**
@@ -76,7 +103,7 @@ public class Room
     /**
      * 获取该房间内的所有物品信息
      */
-    public void getItems()
+    public void getItemsList()
     {
         if(items.size() == 0) System.out.println("No item!");
         for(Item i : items) {

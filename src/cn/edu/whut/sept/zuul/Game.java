@@ -13,10 +13,7 @@
  */
 package cn.edu.whut.sept.zuul;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Function;
 
 
@@ -27,6 +24,7 @@ public class Game
     private HashMap<Integer, Room> roomHashMap;
     private int roomNumbers;
     private Deque<Integer> enterStack;
+    private Player nowPlayer;
 
     /**
      * 创建游戏并初始化内部数据和解析器.
@@ -36,6 +34,7 @@ public class Game
         roomHashMap = new HashMap<>();
         enterStack = new LinkedList<>();
         createRooms();
+        createPlayers();
         roomNumbers = roomHashMap.size();
         parser = new Parser();
 
@@ -53,6 +52,7 @@ public class Game
         outside = new Room("outside the main entrance of the university");
         outside.addItem("apple", "an apple", 1);
         outside.addItem("banana", "a banana", 1);
+        outside.setMagicCookie();
         theater = new Room("in a lecture theater");
         pub = new Room("in the campus pub");
         lab = new Room("in a computing lab");
@@ -81,6 +81,14 @@ public class Game
         currentRoom = outside;  // start game outside
         enterStack.addLast(currentRoom.getId());
 
+    }
+
+    private void createPlayers()
+    {
+        Player sj;
+        sj = new Player(1, "suojian", 1);
+
+        nowPlayer = sj;
     }
 
     /**
@@ -130,6 +138,10 @@ public class Game
         map.put("quit", this::quit);
         map.put("look", this::look);
         map.put("back", this::back);
+        map.put("take", this::take);
+        map.put("drop", this::drop);
+        map.put("items", this::showItems);
+        map.put("eat", this::eat);
         return map.get(param).apply(command);
 
     }
@@ -202,6 +214,7 @@ public class Game
                 currentRoom = roomHashMap.get(currentRoomId);
             }
             enterStack.addLast(currentRoom.getId());
+            nowPlayer.setCurrentRoomId(currentRoom.getId());
             System.out.println(currentRoom.getLongDescription());
         }
         return 0;
@@ -224,7 +237,7 @@ public class Game
 
     private Integer look(Command command)
     {
-        currentRoom.getItems();
+        currentRoom.getItemsList();
         return 0;
     }
 
@@ -254,6 +267,81 @@ public class Game
             System.out.println("you've got back");
             System.out.println(currentRoom.getLongDescription());
         }
+        return 0;
+    }
+
+    private Integer take(Command command)
+    {
+        if(!command.hasSecondWord()) {
+            System.out.println("Take what?");
+            return 0;
+        }
+        String takeItemName = command.getSecondWord();
+        int pos = -1;
+        ArrayList<Item> items = currentRoom.getItems();
+
+        for(int i = 0; i < items.size(); i++) {
+            Item item = items.get(i);
+            if(item.getName().equals(takeItemName)) {
+                pos = i;
+                break;
+            }
+        }
+        if(pos == -1) {
+            System.out.println("you can't take the item don't exist");
+            return 0;
+        }
+        if(nowPlayer.takeItem(items.get(pos))) {
+            items.remove(pos);
+        }
+        else {
+            System.out.println("no room for item");
+        }
+        return 0;
+    }
+
+    private Integer drop(Command command)
+    {
+        if(!command.hasSecondWord()) {
+            System.out.println("Drop what?");
+            return 0;
+        }
+        String dropItemName = command.getSecondWord();
+        Item item = nowPlayer.dropItem(dropItemName);
+        if(item == null) {
+            System.out.println("you don't have this item!");
+            return 0;
+        }
+        currentRoom.addItem(item);
+        return 0;
+    }
+
+    private Integer showItems(Command command)
+    {
+        currentRoom.showItems();
+        nowPlayer.showItems();
+        return 0;
+    }
+
+    private Integer eat(Command command)
+    {
+        if(!command.hasSecondWord()) {
+            System.out.println("Eat what?");
+            return 0;
+        }
+        String eatCookie = command.getSecondWord();
+        if(!eatCookie.equals("cookie")) {
+            System.out.println("you can't eat" + eatCookie);
+            return 0;
+        }
+        if(currentRoom.getMagicCookie()) {
+            nowPlayer.updateLimitWeight(10);
+            System.out.println("you eat a magic cookie");
+        }
+        else {
+            System.out.println("no magic cookie in the room");
+        }
+
         return 0;
     }
 

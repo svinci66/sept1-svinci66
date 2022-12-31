@@ -15,6 +15,10 @@ public class CommandWords
         validCommands.put("help", 1);
         validCommands.put("look", 1);
         validCommands.put("back", 1);
+        validCommands.put("take", 1);
+        validCommands.put("drop", 1);
+        validCommands.put("items", 1);
+        validCommands.put("eat", 1);
     }
 
     /**
@@ -25,8 +29,7 @@ public class CommandWords
     public boolean isCommand(String aString)
     {
         Integer isValid = validCommands.getOrDefault(aString, 0);
-        if(isValid == 1) return true;
-        return false;
+        return isValid == 1;
 
     }
 
