@@ -27,7 +27,6 @@ public class Room
         return magicCookie;
     }
 
-
     public void setMagicCookie() {
         magicCookie = true;
     }
@@ -58,6 +57,12 @@ public class Room
         exits.put(direction, neighbor);
     }
 
+    /**
+     * 添加物品的两种方式
+     * @param name 物品名
+     * @param description 物品描述
+     * @param weight 物品重量
+     */
     public void addItem(String name, String description, int weight) {
         items.add(new Item(name, description, weight));
     }
@@ -75,6 +80,9 @@ public class Room
         return "You are " + description + ".\n" + getExitString();
     }
 
+    /**
+     * 显示房间内的所有物品以及重量和
+     */
     public void showItems() {
         int sumWeight = 0;
         System.out.print("the items of the room are :");

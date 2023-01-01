@@ -1,11 +1,15 @@
+/*
+物品类,用于物品对象
+ */
+
 package cn.edu.whut.sept.zuul;
 
 public class Item {
-    private String name;
+    private final String name;
 
-    private String description;
+    private final String description;
 
-    private int weight;
+    private final int weight;
 
     public Item(String name, String description, int weight){
         this.name = name;

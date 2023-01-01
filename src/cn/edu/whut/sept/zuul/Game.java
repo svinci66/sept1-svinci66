@@ -1,14 +1,14 @@
-/**
- * 该类是“World-of-Zuul”应用程序的主类。
- * 《World of Zuul》是一款简单的文本冒险游戏。用户可以在一些房间组成的迷宫中探险。
- * 你们可以通过扩展该游戏的功能使它更有趣!.
- *
- * 如果想开始执行这个游戏，用户需要创建Game类的一个实例并调用“play”方法。
- *
- * Game类的实例将创建并初始化所有其他类:它创建所有房间，并将它们连接成迷宫；它创建解析器
- * 接收用户输入，并将用户输入转换成命令后开始运行游戏。
- *
- * @author  Michael Kölling and David J. Barnes
+/*
+  该类是“World-of-Zuul”应用程序的主类。
+  《World of Zuul》是一款简单的文本冒险游戏。用户可以在一些房间组成的迷宫中探险。
+  你们可以通过扩展该游戏的功能使它更有趣!.
+
+  如果想开始执行这个游戏，用户需要创建Game类的一个实例并调用“play”方法。
+
+  Game类的实例将创建并初始化所有其他类:它创建所有房间，并将它们连接成迷宫；它创建解析器
+  接收用户输入，并将用户输入转换成命令后开始运行游戏。
+
+  @author  svinci
  * @version 1.0
  */
 package cn.edu.whut.sept.zuul;
@@ -19,11 +19,11 @@ import java.util.function.Function;
 
 public class Game
 {
-    private Parser parser;
+    private final Parser parser;
     private Room currentRoom;
-    private HashMap<Integer, Room> roomHashMap;
-    private int roomNumbers;
-    private Deque<Integer> enterStack;
+    private final HashMap<Integer, Room> roomHashMap;
+    private final int roomNumbers, magicCookieAdd;
+    private final Deque<Integer> enterStack;
     private Player nowPlayer;
 
     /**
@@ -36,6 +36,7 @@ public class Game
         createRooms();
         createPlayers();
         roomNumbers = roomHashMap.size();
+        magicCookieAdd = 10;
         parser = new Parser();
 
 
@@ -80,9 +81,12 @@ public class Game
 
         currentRoom = outside;  // start game outside
         enterStack.addLast(currentRoom.getId());
-
     }
 
+    /**
+     * 用于初始化玩家信息
+     * todo: 数据库存储玩家信息
+     */
     private void createPlayers()
     {
         Player sj;
@@ -160,7 +164,6 @@ public class Game
             System.out.println("I don't know what you mean...");
             return 0;
         }
-
         String commandWord = command.getCommandWord();
         wantToQuit = selectCommand(commandWord, command);
         return wantToQuit;
@@ -204,7 +207,8 @@ public class Game
         }
         else {
             currentRoom = nextRoom;
-            if(currentRoom.getTrap() == true) {
+            //判断是否到陷阱房间,到的话则随机传送
+            if(currentRoom.getTrap()) {
                 System.out.println("You were transferred to a random room");
                 int currentRoomId = currentRoom.getId();
                 Random rand = new Random();
@@ -213,6 +217,7 @@ public class Game
                 }
                 currentRoom = roomHashMap.get(currentRoomId);
             }
+            //更新进入的房间,存入栈
             enterStack.addLast(currentRoom.getId());
             nowPlayer.setCurrentRoomId(currentRoom.getId());
             System.out.println(currentRoom.getLongDescription());
@@ -235,6 +240,11 @@ public class Game
         }
     }
 
+    /**
+     * 查询房间内的物品
+     * @param command 传入指令
+     * @return 不结束
+     */
     private Integer look(Command command)
     {
         currentRoom.getItemsList();
@@ -242,22 +252,34 @@ public class Game
     }
 
     /**
-     * 用于处理后退
-     * @param command
+     * 用于处理后退,可以单步后退/多步后退/回到起点
+     * @param command 传入命令
      * @return 执行结果, 0代表继续, 1代表结束
      */
     private Integer back(Command command)
     {
-        Integer num = 0;
+        int num;
+        if(enterStack.size() == 1) {
+            System.out.println("you are at the beginning");
+            return 0;
+        }
         if(!command.hasSecondWord()) {
             num = 1;
         }
-        try {
-            String numStr = command.getSecondWord();
-            num = Integer.parseInt(numStr);
-        } catch (NumberFormatException e) {
-            System.out.println("wrong number, try again");
+        else {
+            try {
+                String numStr = command.getSecondWord();
+                num = Integer.parseInt(numStr);
+            } catch (NumberFormatException e) {
+                System.out.println(command.getCommandWord());
+                if(!command.getSecondWord().equals("begin")) {
+                    System.out.println("wrong number, try again");
+                    return 0;
+                }
+                else num = enterStack.size() - 1;
+            }
         }
+
         if(num >= enterStack.size()) {
             System.out.println("you can't back so much step");
         }
@@ -270,6 +292,11 @@ public class Game
         return 0;
     }
 
+    /**
+     * 捡起地上的物品
+     * @param command 传入命令
+     * @return 执行结果, 0代表继续, 1代表结束
+     */
     private Integer take(Command command)
     {
         if(!command.hasSecondWord()) {
@@ -291,6 +318,7 @@ public class Game
             System.out.println("you can't take the item don't exist");
             return 0;
         }
+        //如果成功捡起,则房间内物品消失
         if(nowPlayer.takeItem(items.get(pos))) {
             items.remove(pos);
         }
@@ -300,6 +328,11 @@ public class Game
         return 0;
     }
 
+    /**
+     * 丢弃身上的物品
+     * @param command 传入命令
+     * @return 执行结果, 0代表继续, 1代表结束
+     */
     private Integer drop(Command command)
     {
         if(!command.hasSecondWord()) {
@@ -316,6 +349,11 @@ public class Game
         return 0;
     }
 
+    /**
+     * 显示玩家和房间内的所有物品以及重量和
+     * @param command 传入命令
+     * @return 执行结果, 0代表继续, 1代表结束
+     */
     private Integer showItems(Command command)
     {
         currentRoom.showItems();
@@ -323,6 +361,11 @@ public class Game
         return 0;
     }
 
+    /**
+     * 尝试吃房间内的魔法饼干增加负重
+     * @param command 传入命令
+     * @return 执行结果, 0代表继续, 1代表结束
+     */
     private Integer eat(Command command)
     {
         if(!command.hasSecondWord()) {
@@ -335,8 +378,8 @@ public class Game
             return 0;
         }
         if(currentRoom.getMagicCookie()) {
-            nowPlayer.updateLimitWeight(10);
-            System.out.println("you eat a magic cookie");
+            nowPlayer.updateLimitWeight(magicCookieAdd);
+            System.out.println("you've eaten a magic cookie");
         }
         else {
             System.out.println("no magic cookie in the room");

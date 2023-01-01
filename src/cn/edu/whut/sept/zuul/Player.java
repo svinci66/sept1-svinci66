@@ -31,6 +31,9 @@ public class Player {
         this.currentRoomId = currentRoomId;
     }
 
+    /**
+     * 显示身上的所有物品以及重量和
+     */
     public void showItems() {
         System.out.print("the items of the player are :");
         int sumWeight = 0;
@@ -42,6 +45,11 @@ public class Player {
         System.out.println("total weight of the player is : "+sumWeight);
     }
 
+    /**
+     * 用于处理从房间拿取物品
+     * @param item 物品对象
+     * @return 是否成功拿取
+     */
     public boolean takeItem(Item item) {
         if(currentWeight + item.getWeight() > limitWeight) return false;
         currentWeight += item.getWeight();
@@ -49,6 +57,11 @@ public class Player {
         return true;
     }
 
+    /**
+     * 用于处理丢弃物品
+     * @param itemName 物品名称
+     * @return 物品对象
+     */
     public Item dropItem(String itemName) {
         int pos = -1;
         for(int i = 0; i < items.size(); i++) {
@@ -60,6 +73,7 @@ public class Player {
         }
         if(pos == -1) return null;
         Item item = items.get(pos);
+        currentWeight -= item.getWeight();
         items.remove(pos);
         return item;
     }
