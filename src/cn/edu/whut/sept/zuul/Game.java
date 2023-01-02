@@ -13,6 +13,12 @@
  */
 package cn.edu.whut.sept.zuul;
 
+import db.DBUtil;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 
@@ -22,7 +28,7 @@ public class Game
     private final Parser parser;
     private Room currentRoom;
     private final HashMap<Integer, Room> roomHashMap;
-    private final int roomNumbers, magicCookieAdd;
+    private int roomNumbers, magicCookieAdd;
     private final Deque<Integer> enterStack;
     private Player nowPlayer;
 
@@ -33,7 +39,12 @@ public class Game
     {
         roomHashMap = new HashMap<>();
         enterStack = new LinkedList<>();
-        createRooms();
+        //createRooms();
+        try {
+            getMapFromFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         createPlayers();
         roomNumbers = roomHashMap.size();
         magicCookieAdd = 10;
@@ -53,7 +64,7 @@ public class Game
         outside = new Room("outside the main entrance of the university");
         outside.addItem("apple", "an apple", 1);
         outside.addItem("banana", "a banana", 1);
-        outside.setMagicCookie();
+        outside.addItem("magic cookie", "a magic cookie", 10);
         theater = new Room("in a lecture theater");
         pub = new Room("in the campus pub");
         lab = new Room("in a computing lab");
@@ -84,15 +95,66 @@ public class Game
     }
 
     /**
+     *
+     */
+    private void getMapFromFile() throws IOException
+    {
+        FileReader fileReader = new FileReader("D:\\java_save\\sept1-svinci66\\src\\cn\\edu\\whut\\sept\\zuul\\RoomMap.txt");
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
+        String num = bufferedReader.readLine();
+        roomNumbers = Integer.parseInt(num);
+        for(int i = 0; i < roomNumbers; i++) {
+            String desc = bufferedReader.readLine();
+            Room newRoom = new Room(desc);
+            String roomType = bufferedReader.readLine();
+            if(roomType.equals("1")) newRoom.setTrap();
+            roomHashMap.put(newRoom.getId(), newRoom);
+        }
+        for(int i : roomHashMap.keySet()) {
+            Room newRoom = roomHashMap.get(i);
+            String exit = bufferedReader.readLine();
+            int exitNum = Integer.parseInt(exit);
+            for(int j = 0; j < exitNum; j++) {
+                String s = bufferedReader.readLine();
+                String nxt, id;
+                Scanner scanner = new Scanner(s);
+                nxt = scanner.next();
+                id = scanner.next();
+                newRoom.setExit(nxt, roomHashMap.get(Integer.parseInt(id)));
+            }
+            String itemNumStr = bufferedReader.readLine();
+            int itemNUm = Integer.parseInt(itemNumStr);
+            for(int j = 0; j < itemNUm; j++) {
+                String name, desc, weight;
+                name = bufferedReader.readLine();
+                desc = bufferedReader.readLine();
+                weight = bufferedReader.readLine();
+                newRoom.addItem(name, desc, Integer.parseInt(weight));
+            }
+        }
+        //currentRoom = roomHashMap.get(1);
+        //enterStack.addLast(1);
+    }
+
+
+    /**
      * 用于初始化玩家信息
      * todo: 数据库存储玩家信息
      */
     private void createPlayers()
     {
-        Player sj;
-        sj = new Player(1, "suojian", 1);
-
-        nowPlayer = sj;
+        DBUtil db = new DBUtil();
+        System.out.println("Please enter your name");
+        String input = new Scanner(System.in).nextLine();
+        if(input.equals("")) {
+            System.out.println("Welcome back and continue your adventure");
+        }
+        else {
+            String name = input;
+            nowPlayer = new Player(1, name, 1);
+            currentRoom = roomHashMap.get(1);
+            enterStack.addLast(1);
+        }
     }
 
     /**
@@ -377,9 +439,21 @@ public class Game
             System.out.println("you can't eat" + eatCookie);
             return 0;
         }
-        if(currentRoom.getMagicCookie()) {
-            nowPlayer.updateLimitWeight(magicCookieAdd);
-            System.out.println("you've eaten a magic cookie");
+        int pos = -1;
+        ArrayList<Item> items = currentRoom.getItems();
+        for(int i = 0; i < items.size(); i++) {
+            Item item = items.get(i);
+            if(item.getName().equals("magic cookie")) {
+                pos = i;
+                break;
+            }
+        }
+        if(pos != -1) {
+            nowPlayer.updateLimitWeight(items.get(pos).getWeight());
+            items.remove(pos);
+            System.out.print("you've eaten a magic cookie\nnow your limit wight is:");
+            System.out.println(nowPlayer.getLimitWeight());
+
         }
         else {
             System.out.println("no magic cookie in the room");

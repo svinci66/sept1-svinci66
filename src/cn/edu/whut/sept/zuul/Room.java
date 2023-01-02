@@ -9,7 +9,7 @@ public class Room
     private String description;
     private HashMap<String, Room> exits;
     private ArrayList<Item> items;
-    private boolean isTrap, magicCookie;
+    private boolean isTrap;
     private int id;
     private static int cnt = 0;
 
@@ -20,16 +20,8 @@ public class Room
         exits = new HashMap<>();
         items = new ArrayList<>();
         id = ++cnt;
-        magicCookie = false;
     }
 
-    public boolean getMagicCookie() {
-        return magicCookie;
-    }
-
-    public void setMagicCookie() {
-        magicCookie = true;
-    }
 
     public void setTrap() {
         isTrap = true;

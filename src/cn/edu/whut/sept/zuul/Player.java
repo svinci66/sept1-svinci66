@@ -25,7 +25,13 @@ public class Player {
         return currentRoomId;
     }
 
-    public void updateLimitWeight(int x){this.limitWeight += x;}
+    public int getLimitWeight() {
+        return limitWeight;
+    }
+
+    public void updateLimitWeight(int x) {
+        this.limitWeight += x;
+    }
 
     public void setCurrentRoomId(int currentRoomId) {
         this.currentRoomId = currentRoomId;
