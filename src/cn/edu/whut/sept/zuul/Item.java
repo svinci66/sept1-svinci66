@@ -7,13 +7,13 @@ package cn.edu.whut.sept.zuul;
 public class Item {
     private final String name;
 
-    private final String description;
+    private final String desc;
 
     private final int weight;
 
     public Item(String name, String description, int weight){
         this.name = name;
-        this.description = description;
+        this.desc = description;
         this.weight = weight;
     }
 
@@ -22,7 +22,7 @@ public class Item {
     }
 
     public String getDescription(){
-        return description;
+        return desc;
     }
 
     public int getWeight(){

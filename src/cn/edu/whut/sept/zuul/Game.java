@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.function.Function;
 
@@ -143,18 +144,40 @@ public class Game
      */
     private void createPlayers()
     {
-        DBUtil db = new DBUtil();
         System.out.println("Please enter your name");
-        String input = new Scanner(System.in).nextLine();
-        if(input.equals("")) {
-            System.out.println("Welcome back and continue your adventure");
-        }
-        else {
-            String name = input;
-            nowPlayer = new Player(1, name, 1);
+        DBUtil db = new DBUtil();
+        try{
+            db.getConnection();
+            String input = new Scanner(System.in).nextLine();
+            String sql = "SELECT * FROM `user` WHERE userName='" + input + "'";
+            ResultSet rs = db.executeQuery(sql, null);
+            if(rs.next()) {
+                System.out.println("Welcome back and continue your adventure");
+                nowPlayer = new Player(rs.getInt("nowRoomId"), rs.getString("userName"), rs.getInt("capacity"));
+            }
+            else {
+                String name = input;
+                String saveSql = "call `save_user`(?,?,?,@res);";
+                Object[] param = new Object[]{input, 0, 10};
+                if(db.executeUpdate(saveSql, param) > 0) {
+                    System.out.println("save a new user!");
+                    nowPlayer = new Player(10, name, 1);
+                }
+                else {
+                    System.out.println("save error!");
+                }
+
+            }
             currentRoom = roomHashMap.get(1);
             enterStack.addLast(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.closeAll();
         }
+
+
+
     }
 
     /**
@@ -181,12 +204,11 @@ public class Game
     private void printWelcome()
     {
         System.out.println();
-        System.out.println("you're right, but");
-        System.out.println("Welcome to the World of Genshin!");
-        System.out.println("The game takes place in a fantasy world called \"Tivat\"");
-        System.out.println("where those chosen by the gods will be granted the \"Eye of God\" to channel the power of the elements");
+        System.out.println("Welcome to the World of Zuul!");
+        System.out.println("World of Zuul is a new, incredibly boring adventure game.");
         System.out.println("Type 'help' if you need help.");
         System.out.println();
+        System.out.println(currentRoom.getLongDescription());
         System.out.println(currentRoom.getLongDescription());
     }
 
@@ -298,8 +320,26 @@ public class Game
             return 0;
         }
         else {
-            return 1;  // signal that we want to quit
+            DBUtil db = new DBUtil();
+            try{
+                db.getConnection();
+                String updateSql = "call `update_user`(?,?,?);";
+                Object[] param = new Object[]{nowPlayer.getName(), currentRoom.getId(), nowPlayer.getLimitWeight()};
+                if(db.executeUpdate(updateSql, param) > 0) {
+                    System.out.println("save success!");
+                }
+                else {
+                    System.out.println("save error!");
+                }
+                return 1;  // signal that we want to quit
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                db.closeAll();
+            }
+            return 1;
         }
+
     }
 
     /**

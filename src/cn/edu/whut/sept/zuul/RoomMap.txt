@@ -1,0 +1,35 @@
+5
+outside the main entrance of the university
+0
+in a lecture theater
+1
+in the campus pub
+0
+in a computing lab
+0
+in the computing admin office
+0
+3
+east 2
+south 4
+west 3
+2
+apple
+an apple
+1
+banana
+a banana
+1
+1
+west 1
+0
+1
+east 1
+0
+2
+north 1
+east 5
+0
+1
+west 4
+0
