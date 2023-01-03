@@ -50,45 +50,6 @@ public class Game {
 
     }
 
-    /**
-     * 创建所有房间对象并连接其出口用以构建迷宫.
-     */
-    private void createRooms() {
-        Room outside, theater, pub, lab, office;
-
-        // create the rooms
-        outside = new Room("outside the main entrance of the university");
-        outside.addItem("apple", "an apple", 1);
-        outside.addItem("banana", "a banana", 1);
-        outside.addItem("magic cookie", "a magic cookie", 10);
-        theater = new Room("in a lecture theater");
-        pub = new Room("in the campus pub");
-        lab = new Room("in a computing lab");
-        office = new Room("in the computing admin office");
-
-        // initialise room exits
-        outside.setExit("east", theater);
-        outside.setExit("south", lab);
-        outside.setExit("west", pub);
-        roomHashMap.put(outside.getId(), outside);
-
-        theater.setExit("west", outside);
-        roomHashMap.put(theater.getId(), theater);
-        theater.setTrap();
-
-        pub.setExit("east", outside);
-        roomHashMap.put(pub.getId(), pub);
-
-        lab.setExit("north", outside);
-        lab.setExit("east", office);
-        roomHashMap.put(lab.getId(), lab);
-
-        office.setExit("west", lab);
-        roomHashMap.put(office.getId(), office);
-
-        currentRoom = outside;  // start game outside
-        enterStack.addLast(currentRoom.getId());
-    }
 
     /**
      * 文件第一行输入一共有n个房间
