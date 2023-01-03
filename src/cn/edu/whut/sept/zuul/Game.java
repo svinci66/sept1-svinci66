@@ -16,7 +16,6 @@ package cn.edu.whut.sept.zuul;
 import db.DBUtil;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -29,7 +28,7 @@ public class Game
     private final Parser parser;
     private Room currentRoom;
     private final HashMap<Integer, Room> roomHashMap;
-    private int roomNumbers, magicCookieAdd;
+    private int roomNumbers;
     private final Deque<Integer> enterStack;
     private Player nowPlayer;
 
@@ -48,7 +47,6 @@ public class Game
         }
         createPlayers();
         roomNumbers = roomHashMap.size();
-        magicCookieAdd = 10;
         parser = new Parser();
 
 
@@ -96,7 +94,18 @@ public class Game
     }
 
     /**
-     *
+     *文件第一行输入一共有n个房间
+     * 之后对于每个房间
+     * 第一行输入一个字符串表示房间的介绍
+     * 第二杠输入一个整数表示是不是要随机传送的房间
+     * 之后再次输入这n个房间的相关信息
+     * 第一行表示有几个相邻房间
+     * 接下来的若干行表示相邻的方位,和相邻的房间编号
+     * 第二行输入有几个物品
+     * 对于每个物品
+     * 第一行输入物品名称
+     * 第二行输入物品介绍
+     * 第三行输入一个整数表示物品重量
      */
     private void getMapFromFile() throws IOException
     {
@@ -133,8 +142,6 @@ public class Game
                 newRoom.addItem(name, desc, Integer.parseInt(weight));
             }
         }
-        //currentRoom = roomHashMap.get(1);
-        //enterStack.addLast(1);
     }
 
 
@@ -154,28 +161,30 @@ public class Game
             if(rs.next()) {
                 System.out.println("Welcome back and continue your adventure");
                 nowPlayer = new Player(rs.getInt("nowRoomId"), rs.getString("userName"), rs.getInt("capacity"));
+                currentRoom = roomHashMap.get(rs.getInt("nowRoomId"));
+                System.out.println(rs.getInt("capacity"));
+                enterStack.addLast(currentRoom.getId());
             }
             else {
-                String name = input;
                 String saveSql = "call `save_user`(?,?,?,@res);";
                 Object[] param = new Object[]{input, 0, 10};
                 if(db.executeUpdate(saveSql, param) > 0) {
                     System.out.println("save a new user!");
-                    nowPlayer = new Player(10, name, 1);
+                    nowPlayer = new Player(1, input, 10);
+                    currentRoom = roomHashMap.get(1);
+                    enterStack.addLast(currentRoom.getId());
                 }
                 else {
                     System.out.println("save error!");
                 }
 
             }
-            currentRoom = roomHashMap.get(1);
-            enterStack.addLast(1);
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             db.closeAll();
         }
-
 
 
     }
@@ -208,7 +217,6 @@ public class Game
         System.out.println("World of Zuul is a new, incredibly boring adventure game.");
         System.out.println("Type 'help' if you need help.");
         System.out.println();
-        System.out.println(currentRoom.getLongDescription());
         System.out.println(currentRoom.getLongDescription());
     }
 
@@ -349,6 +357,7 @@ public class Game
      */
     private Integer look(Command command)
     {
+        System.out.println(currentRoom.getLongDescription());
         currentRoom.getItemsList();
         return 0;
     }
@@ -388,6 +397,7 @@ public class Game
         else {
             for(int i = 0; i < num; i++) enterStack.removeLast();
             currentRoom = roomHashMap.get(enterStack.getLast());
+            nowPlayer.setCurrentRoomId(currentRoom.getId());
             System.out.println("you've got back");
             System.out.println(currentRoom.getLongDescription());
         }
@@ -422,6 +432,7 @@ public class Game
         }
         //如果成功捡起,则房间内物品消失
         if(nowPlayer.takeItem(items.get(pos))) {
+            System.out.println("you've taken this item");
             items.remove(pos);
         }
         else {
@@ -447,6 +458,7 @@ public class Game
             System.out.println("you don't have this item!");
             return 0;
         }
+        System.out.println("you've dropped this item");
         currentRoom.addItem(item);
         return 0;
     }

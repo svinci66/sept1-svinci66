@@ -4,11 +4,11 @@ import java.util.ArrayList;
 
 public class Player {
     private int limitWeight, currentWeight;
-    private String name;
+    private final String name;
     private int currentRoomId;
-    private ArrayList<Item> items;
+    private final ArrayList<Item> items;
 
-    public Player(int limitWeight, String name, int currentRoomId) {
+    public Player(int currentRoomId, String name, int limitWeight) {
         this.limitWeight = limitWeight;
         this.name = name;
         this.currentRoomId = currentRoomId;
@@ -19,6 +19,10 @@ public class Player {
 
     public String getName() {
         return name;
+    }
+
+    public ArrayList<Item> getItems() {
+        return items;
     }
 
     public int getCurrentRoomId() {

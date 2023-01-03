@@ -6,11 +6,11 @@ import java.util.HashMap;
 
 public class Room
 {
-    private String description;
-    private HashMap<String, Room> exits;
-    private ArrayList<Item> items;
+    private final String description;
+    private final HashMap<String, Room> exits;
+    private final ArrayList<Item> items;
     private boolean isTrap;
-    private int id;
+    private final int id;
     private static int cnt = 0;
 
     public Room(String description)
@@ -92,12 +92,12 @@ public class Room
      */
     private String getExitString()
     {
-        String returnString = "Exits:";
+        StringBuilder returnString = new StringBuilder("Exits:");
         Set<String> keys = exits.keySet();
         for(String exit : keys) {
-            returnString += " " + exit;
+            returnString.append(" ").append(exit);
         }
-        return returnString;
+        return returnString.toString();
     }
 
     /**

@@ -2,9 +2,9 @@
 outside the main entrance of the university
 0
 in a lecture theater
-1
-in the campus pub
 0
+in the campus pub
+1
 in a computing lab
 0
 in the computing admin office
@@ -16,13 +16,16 @@ west 3
 2
 apple
 an apple
-1
+10
 banana
 a banana
 1
 1
 west 1
-0
+1
+magic cookie
+a magic cookie
+10
 1
 east 1
 0

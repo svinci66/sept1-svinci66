@@ -10,8 +10,7 @@ public class DBUtil {
     /**
      * 得到数据库连接
      */
-    public Connection getConnection() throws ClassNotFoundException,
-            SQLException, InstantiationException, IllegalAccessException {
+    public void getConnection() throws SQLException{
         // 通过Config获取MySQL数据库配置信息
         String driver = Config.getValue("driver");
         String url = Config.getValue("url");
@@ -22,7 +21,6 @@ public class DBUtil {
             Class.forName(driver);
             // 建立数据库连结
             conn = DriverManager.getConnection(url, user, pwd);
-            return conn;
         } catch (Exception e) {
             // 如果连接过程出现异常，抛出异常信息
             throw new SQLException("驱动错误或连接失败！");
@@ -109,26 +107,8 @@ public class DBUtil {
         return num;
     }
 
-    public int executeSQLAndReturnPrimaryKey(String prepareSQl, Object[] param) {
-        try{
-            pstmt = conn.prepareStatement(prepareSQl, Statement.RETURN_GENERATED_KEYS);
-            if(param != null) {
-                for(int i = 0; i < param.length; i++) {
-                    pstmt.setObject(i + 1, param[i]);
-                }
-            }
-            pstmt.executeUpdate();
-            rs = pstmt.getGeneratedKeys();
-            if(rs.next()) {
-                return  rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return  -1;
-    }
 
-    public static void main(String[] args) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) throws SQLException {
         DBUtil db = new DBUtil();
         db.getConnection();
     }
