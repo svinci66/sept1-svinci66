@@ -10,7 +10,7 @@ public class DBUtil {
     /**
      * 得到数据库连接
      */
-    public void getConnection() throws SQLException{
+    public void getConnection() throws SQLException {
         // 通过Config获取MySQL数据库配置信息
         String driver = Config.getValue("driver");
         String url = Config.getValue("url");

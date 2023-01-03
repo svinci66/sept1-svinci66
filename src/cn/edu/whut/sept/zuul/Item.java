@@ -11,21 +11,21 @@ public class Item {
 
     private final int weight;
 
-    public Item(String name, String description, int weight){
+    public Item(String name, String description, int weight) {
         this.name = name;
         this.desc = description;
         this.weight = weight;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public String getDescription(){
+    public String getDescription() {
         return desc;
     }
 
-    public int getWeight(){
+    public int getWeight() {
         return weight;
     }
 

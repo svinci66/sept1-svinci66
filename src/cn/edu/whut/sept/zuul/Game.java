@@ -23,8 +23,7 @@ import java.util.*;
 import java.util.function.Function;
 
 
-public class Game
-{
+public class Game {
     private final Parser parser;
     private Room currentRoom;
     private final HashMap<Integer, Room> roomHashMap;
@@ -35,8 +34,7 @@ public class Game
     /**
      * 创建游戏并初始化内部数据和解析器.
      */
-    public Game()
-    {
+    public Game() {
         roomHashMap = new HashMap<>();
         enterStack = new LinkedList<>();
         //createRooms();
@@ -55,8 +53,7 @@ public class Game
     /**
      * 创建所有房间对象并连接其出口用以构建迷宫.
      */
-    private void createRooms()
-    {
+    private void createRooms() {
         Room outside, theater, pub, lab, office;
 
         // create the rooms
@@ -94,7 +91,7 @@ public class Game
     }
 
     /**
-     *文件第一行输入一共有n个房间
+     * 文件第一行输入一共有n个房间
      * 之后对于每个房间
      * 第一行输入一个字符串表示房间的介绍
      * 第二杠输入一个整数表示是不是要随机传送的房间
@@ -107,24 +104,23 @@ public class Game
      * 第二行输入物品介绍
      * 第三行输入一个整数表示物品重量
      */
-    private void getMapFromFile() throws IOException
-    {
+    private void getMapFromFile() throws IOException {
         FileReader fileReader = new FileReader("D:\\java_save\\sept1-svinci66\\src\\cn\\edu\\whut\\sept\\zuul\\RoomMap.txt");
         BufferedReader bufferedReader = new BufferedReader(fileReader);
         String num = bufferedReader.readLine();
         roomNumbers = Integer.parseInt(num);
-        for(int i = 0; i < roomNumbers; i++) {
+        for (int i = 0; i < roomNumbers; i++) {
             String desc = bufferedReader.readLine();
             Room newRoom = new Room(desc);
             String roomType = bufferedReader.readLine();
-            if(roomType.equals("1")) newRoom.setTrap();
+            if (roomType.equals("1")) newRoom.setTrap();
             roomHashMap.put(newRoom.getId(), newRoom);
         }
-        for(int i : roomHashMap.keySet()) {
+        for (int i : roomHashMap.keySet()) {
             Room newRoom = roomHashMap.get(i);
             String exit = bufferedReader.readLine();
             int exitNum = Integer.parseInt(exit);
-            for(int j = 0; j < exitNum; j++) {
+            for (int j = 0; j < exitNum; j++) {
                 String s = bufferedReader.readLine();
                 String nxt, id;
                 Scanner scanner = new Scanner(s);
@@ -134,7 +130,7 @@ public class Game
             }
             String itemNumStr = bufferedReader.readLine();
             int itemNUm = Integer.parseInt(itemNumStr);
-            for(int j = 0; j < itemNUm; j++) {
+            for (int j = 0; j < itemNUm; j++) {
                 String name, desc, weight;
                 name = bufferedReader.readLine();
                 desc = bufferedReader.readLine();
@@ -149,32 +145,29 @@ public class Game
      * 用于初始化玩家信息
      * todo: 数据库存储玩家信息
      */
-    private void createPlayers()
-    {
+    private void createPlayers() {
         System.out.println("Please enter your name");
         DBUtil db = new DBUtil();
-        try{
+        try {
             db.getConnection();
             String input = new Scanner(System.in).nextLine();
             String sql = "SELECT * FROM `user` WHERE userName='" + input + "'";
             ResultSet rs = db.executeQuery(sql, null);
-            if(rs.next()) {
+            if (rs.next()) {
                 System.out.println("Welcome back and continue your adventure");
                 nowPlayer = new Player(rs.getInt("nowRoomId"), rs.getString("userName"), rs.getInt("capacity"));
                 currentRoom = roomHashMap.get(rs.getInt("nowRoomId"));
                 System.out.println(rs.getInt("capacity"));
                 enterStack.addLast(currentRoom.getId());
-            }
-            else {
+            } else {
                 String saveSql = "call `save_user`(?,?,?,@res);";
                 Object[] param = new Object[]{input, 0, 10};
-                if(db.executeUpdate(saveSql, param) > 0) {
+                if (db.executeUpdate(saveSql, param) > 0) {
                     System.out.println("save a new user!");
                     nowPlayer = new Player(1, input, 10);
                     currentRoom = roomHashMap.get(1);
                     enterStack.addLast(currentRoom.getId());
-                }
-                else {
+                } else {
                     System.out.println("save error!");
                 }
 
@@ -190,10 +183,9 @@ public class Game
     }
 
     /**
-     *  游戏主控循环，直到用户输入退出命令后结束整个程序.
+     * 游戏主控循环，直到用户输入退出命令后结束整个程序.
      */
-    public void play()
-    {
+    public void play() {
         printWelcome();
 
         // Enter the main command loop.  Here we repeatedly read commands and
@@ -210,8 +202,7 @@ public class Game
     /**
      * 向用户输出欢迎信息.
      */
-    private void printWelcome()
-    {
+    private void printWelcome() {
         System.out.println();
         System.out.println("Welcome to the World of Zuul!");
         System.out.println("World of Zuul is a new, incredibly boring adventure game.");
@@ -222,12 +213,12 @@ public class Game
 
     /**
      * 用于选择执行哪一种操作
+     *
      * @param command 命令
-     * @param param 操作的种类
+     * @param param   操作的种类
      * @return 返回程序是否继续进行
      */
-    public Integer selectCommand(String param, Command command)
-    {
+    public Integer selectCommand(String param, Command command) {
         HashMap<String, Function<Command, Integer>> map = new HashMap<>();
         map.put("help", this::printHelp);
         map.put("go", this::goRoom);
@@ -245,14 +236,14 @@ public class Game
 
     /**
      * 执行用户输入的游戏指令.
+     *
      * @param command 待处理的游戏指令，由解析器从用户输入内容生成.
      * @return 如果执行的是游戏结束指令，则返回true，否则返回false.
      */
-    private Integer processCommand(Command command)
-    {
+    private Integer processCommand(Command command) {
         Integer wantToQuit;
 
-        if(command.isUnknown()) {
+        if (command.isUnknown()) {
             System.out.println("I don't know what you mean...");
             return 0;
         }
@@ -267,8 +258,7 @@ public class Game
      * 执行help指令，在终端打印游戏帮助信息.
      * 此处会输出游戏中用户可以输入的命令列表
      */
-    private Integer printHelp(Command command)
-    {
+    private Integer printHelp(Command command) {
         System.out.println("You are lost. You are alone. You wander");
         System.out.println("around at the university.");
         System.out.println();
@@ -281,9 +271,8 @@ public class Game
      * 执行go指令，向房间的指定方向出口移动，如果该出口连接了另一个房间，则会进入该房间，
      * 否则打印输出错误提示信息.
      */
-    private Integer goRoom(Command command)
-    {
-        if(!command.hasSecondWord()) {
+    private Integer goRoom(Command command) {
+        if (!command.hasSecondWord()) {
             // if there is no second word, we don't know where to go...
             System.out.println("Go where?");
             return 0;
@@ -296,15 +285,14 @@ public class Game
 
         if (nextRoom == null) {
             System.out.println("There is no door!");
-        }
-        else {
+        } else {
             currentRoom = nextRoom;
             //判断是否到陷阱房间,到的话则随机传送
-            if(currentRoom.getTrap()) {
+            if (currentRoom.getTrap()) {
                 System.out.println("You were transferred to a random room");
                 int currentRoomId = currentRoom.getId();
                 Random rand = new Random();
-                while(currentRoomId == currentRoom.getId()) {
+                while (currentRoomId == currentRoom.getId()) {
                     currentRoomId = rand.nextInt(roomNumbers) + 1;
                 }
                 currentRoom = roomHashMap.get(currentRoomId);
@@ -319,24 +307,22 @@ public class Game
 
     /**
      * 执行Quit指令，用户退出游戏。如果用户在命令中输入了其他参数，则进一步询问用户是否真的退出.
+     *
      * @return 如果游戏需要退出则返回1，否则返回0.
      */
-    private Integer quit(Command command)
-    {
-        if(command.hasSecondWord()) {
+    private Integer quit(Command command) {
+        if (command.hasSecondWord()) {
             System.out.println("Quit what?");
             return 0;
-        }
-        else {
+        } else {
             DBUtil db = new DBUtil();
-            try{
+            try {
                 db.getConnection();
                 String updateSql = "call `update_user`(?,?,?);";
                 Object[] param = new Object[]{nowPlayer.getName(), currentRoom.getId(), nowPlayer.getLimitWeight()};
-                if(db.executeUpdate(updateSql, param) > 0) {
+                if (db.executeUpdate(updateSql, param) > 0) {
                     System.out.println("save success!");
-                }
-                else {
+                } else {
                     System.out.println("save error!");
                 }
                 return 1;  // signal that we want to quit
@@ -352,11 +338,11 @@ public class Game
 
     /**
      * 查询房间内的物品
+     *
      * @param command 传入指令
      * @return 不结束
      */
-    private Integer look(Command command)
-    {
+    private Integer look(Command command) {
         System.out.println(currentRoom.getLongDescription());
         currentRoom.getItemsList();
         return 0;
@@ -364,38 +350,35 @@ public class Game
 
     /**
      * 用于处理后退,可以单步后退/多步后退/回到起点
+     *
      * @param command 传入命令
      * @return 执行结果, 0代表继续, 1代表结束
      */
-    private Integer back(Command command)
-    {
+    private Integer back(Command command) {
         int num;
-        if(enterStack.size() == 1) {
+        if (enterStack.size() == 1) {
             System.out.println("you are at the beginning");
             return 0;
         }
-        if(!command.hasSecondWord()) {
+        if (!command.hasSecondWord()) {
             num = 1;
-        }
-        else {
+        } else {
             try {
                 String numStr = command.getSecondWord();
                 num = Integer.parseInt(numStr);
             } catch (NumberFormatException e) {
                 System.out.println(command.getCommandWord());
-                if(!command.getSecondWord().equals("begin")) {
+                if (!command.getSecondWord().equals("begin")) {
                     System.out.println("wrong number, try again");
                     return 0;
-                }
-                else num = enterStack.size() - 1;
+                } else num = enterStack.size() - 1;
             }
         }
 
-        if(num >= enterStack.size()) {
+        if (num >= enterStack.size()) {
             System.out.println("you can't back so much step");
-        }
-        else {
-            for(int i = 0; i < num; i++) enterStack.removeLast();
+        } else {
+            for (int i = 0; i < num; i++) enterStack.removeLast();
             currentRoom = roomHashMap.get(enterStack.getLast());
             nowPlayer.setCurrentRoomId(currentRoom.getId());
             System.out.println("you've got back");
@@ -406,12 +389,12 @@ public class Game
 
     /**
      * 捡起地上的物品
+     *
      * @param command 传入命令
      * @return 执行结果, 0代表继续, 1代表结束
      */
-    private Integer take(Command command)
-    {
-        if(!command.hasSecondWord()) {
+    private Integer take(Command command) {
+        if (!command.hasSecondWord()) {
             System.out.println("Take what?");
             return 0;
         }
@@ -419,23 +402,22 @@ public class Game
         int pos = -1;
         ArrayList<Item> items = currentRoom.getItems();
 
-        for(int i = 0; i < items.size(); i++) {
+        for (int i = 0; i < items.size(); i++) {
             Item item = items.get(i);
-            if(item.getName().equals(takeItemName)) {
+            if (item.getName().equals(takeItemName)) {
                 pos = i;
                 break;
             }
         }
-        if(pos == -1) {
+        if (pos == -1) {
             System.out.println("you can't take the item don't exist");
             return 0;
         }
         //如果成功捡起,则房间内物品消失
-        if(nowPlayer.takeItem(items.get(pos))) {
+        if (nowPlayer.takeItem(items.get(pos))) {
             System.out.println("you've taken this item");
             items.remove(pos);
-        }
-        else {
+        } else {
             System.out.println("no room for item");
         }
         return 0;
@@ -443,18 +425,18 @@ public class Game
 
     /**
      * 丢弃身上的物品
+     *
      * @param command 传入命令
      * @return 执行结果, 0代表继续, 1代表结束
      */
-    private Integer drop(Command command)
-    {
-        if(!command.hasSecondWord()) {
+    private Integer drop(Command command) {
+        if (!command.hasSecondWord()) {
             System.out.println("Drop what?");
             return 0;
         }
         String dropItemName = command.getSecondWord();
         Item item = nowPlayer.dropItem(dropItemName);
-        if(item == null) {
+        if (item == null) {
             System.out.println("you don't have this item!");
             return 0;
         }
@@ -465,11 +447,11 @@ public class Game
 
     /**
      * 显示玩家和房间内的所有物品以及重量和
+     *
      * @param command 传入命令
      * @return 执行结果, 0代表继续, 1代表结束
      */
-    private Integer showItems(Command command)
-    {
+    private Integer showItems(Command command) {
         currentRoom.showItems();
         nowPlayer.showItems();
         return 0;
@@ -477,37 +459,36 @@ public class Game
 
     /**
      * 尝试吃房间内的魔法饼干增加负重
+     *
      * @param command 传入命令
      * @return 执行结果, 0代表继续, 1代表结束
      */
-    private Integer eat(Command command)
-    {
-        if(!command.hasSecondWord()) {
+    private Integer eat(Command command) {
+        if (!command.hasSecondWord()) {
             System.out.println("Eat  what?");
             return 0;
         }
         String eatCookie = command.getSecondWord();
-        if(!eatCookie.equals("cookie")) {
+        if (!eatCookie.equals("cookie")) {
             System.out.println("you can't eat" + eatCookie);
             return 0;
         }
         int pos = -1;
         ArrayList<Item> items = currentRoom.getItems();
-        for(int i = 0; i < items.size(); i++) {
+        for (int i = 0; i < items.size(); i++) {
             Item item = items.get(i);
-            if(item.getName().equals("magic cookie")) {
+            if (item.getName().equals("magic cookie")) {
                 pos = i;
                 break;
             }
         }
-        if(pos != -1) {
+        if (pos != -1) {
             nowPlayer.updateLimitWeight(items.get(pos).getWeight());
             items.remove(pos);
             System.out.print("you've eaten a magic cookie\nnow your limit wight is:");
             System.out.println(nowPlayer.getLimitWeight());
 
-        }
-        else {
+        } else {
             System.out.println("no magic cookie in the room");
         }
 

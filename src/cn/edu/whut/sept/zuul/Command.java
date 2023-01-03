@@ -1,41 +1,37 @@
 package cn.edu.whut.sept.zuul;
 
-public class Command
-{
+public class Command {
     private final String commandWord;
     private final String secondWord;
 
-    public Command(String firstWord, String secondWord)
-    {
+    public Command(String firstWord, String secondWord) {
         commandWord = firstWord;
         this.secondWord = secondWord;
     }
 
-    public String getCommandWord()
-    {
+    public String getCommandWord() {
         return commandWord;
     }
 
-    public String getSecondWord()
-    {
+    public String getSecondWord() {
         return secondWord;
     }
 
     /**
      * 判断用户的输入指令是否合法
+     *
      * @return 如果用户输入指令存在第一个词，则返回true，否则返回false.
      */
-    public boolean isUnknown()
-    {
+    public boolean isUnknown() {
         return (commandWord == null);
     }
 
     /**
      * 判断指令是否存在第二个词
+     *
      * @return 如果指令存在第二个词，则返回true，否则返回false.
      */
-    public boolean hasSecondWord()
-    {
+    public boolean hasSecondWord() {
         return (secondWord != null);
     }
 }

@@ -99,6 +99,9 @@
 ### 3.5优化代码编写风格和结构
 
 在全部功能基本实现后，利用IDEA内自带的代码检查功能对代码的格式和命名进行修改。
+
+之后利用codestyle，使用google的java规范对代码进行调整。
+
 同时尽量保证新编写的代码和样例工程中的代码风格保持一致。
 
 ### 3.6对项目进行软件测试
@@ -220,7 +223,53 @@ return map.get(param).apply(command);
 
 1. 黑盒测试
 
-   todo
+   以PlayerTest类中测试拾取和丢弃物件为例
+
+   ```java
+   package cn.edu.whut.sept.zuul;
+   
+   import org.junit.Test;
+   
+   import java.util.ArrayList;
+   
+   public class PlayerTest {
+       @Test
+       public void takeItem() {
+           Player player=new Player(0,"qwq",1000);
+           player.takeItem(new Item("apple","an apple",50));
+           ArrayList<Item> bag=player.getItems();
+           if(bag.get(0).getName().equals("apple")) {
+               System.out.println("carryItem Accepted");
+           }else{
+               System.out.println("carryItem Error");
+           }
+       }
+   
+       //此测试必须在carryItem正确的情况下才有效
+       @Test
+       public void dropItem() {
+           Player player=new Player(0,"qwq",1000);
+           player.takeItem(new Item("apple","an apple",50));
+           player.dropItem("apple");
+           ArrayList<Item> bag=player.getItems();
+           if(bag.size()==0) {
+               System.out.println("dropItem Accepted");
+           }else{
+               System.out.println("dropItem Error");
+           }
+       }
+   
+   
+   }
+   ```
+
+   通过模拟一个物件的拾取和丢弃,观察玩家背包的变化来分析结果,如果和预期一致则说明方法正确。
+
+   [![88-X9-QZEPC12-PA0-B1-U8-CI1.png](https://i.postimg.cc/VvSRfgJB/88-X9-QZEPC12-PA0-B1-U8-CI1.png)](https://postimg.cc/GTCYzkJH)
+
+   [![ANTCS-T0-V2-MSGWVZBHWJ.png](https://i.postimg.cc/Bn5CnXny/ANTCS-T0-V2-MSGWVZBHWJ.png)](https://postimg.cc/hXjmC4xb)
+
+   
 
 2. 白盒测试
 
@@ -292,23 +341,67 @@ return map.get(param).apply(command);
    > 27. 已注册用户登录,显示继续冒险
    > 28. 当前房间信息为上次冒险退出时所在房间
 
-### 6.5提交情况
+### 6.5 编码格式规范调整
 
-todo
+先在github中下载并保存Google 的 Java Code Style （**intellij-java-google-style.xml**）
+
+在Settings->code style->java中导入刚才的xml文件并应用
+
+现在idea的代码风格检查和xml文件中的一致
+
+可以通过code->reformat code的方式来自动调正编码格式
+
+### 6.6提交情况
+
+在个人仓库的commit记录如下所示
+
+[![2-GT-0-WBMYBEZC0-J-X7.png](https://i.postimg.cc/tCjkQ3XP/2-GT-0-WBMYBEZC0-J-X7.png)](https://postimg.cc/Z0wp6yvK)
+
+[![Q1-C-983-C3-E-A-V0-V3-P-HO.png](https://i.postimg.cc/ZRvHZjBP/Q1-C-983-C3-E-A-V0-V3-P-HO.png)](https://postimg.cc/7GD0n3Nb)
 
 ## 7.实施过程问题记录与分析
 
-todo
+1. 刚开始发现无法直接使用https链接clone到本地
+
+   原因:原项目的属性为private
+
+   解决方法：将classroom内的项目修改为public合并fork到自己的仓库，使用ssh链接clone到本地即可。
+
+2. 加入Player类后运行报错NullPointerException
+
+   原因：初始化顺序出错，导致Player的初始化中使用了没有初始化的对象
+
+   解决方法：调换初始化的顺序
+
+3. 无法连接至数据库
+
+   原因：没有配置与mysql交互的jar文件
+
+   解决方法：在网上下载对应版本的jar包，并在项目结构中的模块添加
+
+4. 新增的代码不满足需求，需要重写
+
+   解决方法：使用git命令进行版本回退，重新编写新的代码。
 
 ## 8.任务总结
 
-todo
+本次实践任务耗时一周左右，由于是第一次尝试个人使用github来开发一个项目，对于部分操作，如git命令，github的使用并不是十分熟练，但在不断查阅各种资料和尝试后，最终解决了所遇到的问题。本人认为自己在这次实践任务中收获了许多，具体内容如下：
+
+1. 学习了如何使用github,github在以后的学习和工作中占有非常重要的地位，学习和github有关的相关知识是非常有必要的
+2. 熟练了对git命令的掌握，在之后可以更好的利用git来进行版本管理
+3. 学习了很多开发规范，如代码规范，版本号规范，提交规范等
+4. 加强了自己对于面向对象思想的理解，可以在开发中更加熟练的使用这种思想来指导编码
+5. 对java语言有了更加深入的了解，熟悉了一些java不同于其他语言的特性
+6. 更加熟练了IDEA编辑器，可以更高效的进行开发
 
 ## 9.参考文献
 
 1. [基于 angular 规范的 commit](https://www.shuzhiduo.com/A/lk5amGwZ51/)
 2. [在IDEA上进行JUnit测试](https://blog.csdn.net/qq_44028290/article/details/108903857)
-3. todo
+3. [git：多分支管理](https://blog.csdn.net/qq_56030168/article/details/128163591)
+4. [github版本回退](https://www.likecs.com/show-205129316.html)
+5. [Intellij IDEA 配置 Code Style](https://blog.csdn.net/dufufd/article/details/100095685)
+6. [java通过字符串调用方法](https://blog.csdn.net/fennud_xiaoqiang/article/details/118551287)
 
 
 

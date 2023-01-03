@@ -5,6 +5,7 @@ import java.util.Properties;
 
 public class Config {
     private static Properties p = null;
+
     static {
         try {
             p = new Properties();
@@ -14,6 +15,7 @@ public class Config {
             e.printStackTrace();
         }
     }
+
     //获取配置类的参数
     public static String getValue(String key) {
         return p.get(key).toString();

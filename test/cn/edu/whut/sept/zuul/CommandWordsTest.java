@@ -6,10 +6,10 @@ public class CommandWordsTest {
 
     @Test
     public void isCommand() {
-        CommandWords test=new CommandWords();
-        if(test.isCommand("look") && !test.isCommand("check")){
+        CommandWords test = new CommandWords();
+        if (test.isCommand("look") && !test.isCommand("check")) {
             System.out.println("Accepted");
-        }else{
+        } else {
             System.out.println("Error!");
         }
     }
