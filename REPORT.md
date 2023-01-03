@@ -221,7 +221,7 @@ return map.get(param).apply(command);
 
 ### 6.4测试结果
 
-1. 黑盒测试
+1. 白盒测试
 
    以PlayerTest类中测试拾取和丢弃物件为例
 
@@ -271,7 +271,7 @@ return map.get(param).apply(command);
 
    
 
-2. 白盒测试
+2. 黑盒测试
 
    使用在和样例工程一样地图结构的前提下,
    在初始房间加入两个物件,
